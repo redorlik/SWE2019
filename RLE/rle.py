@@ -7,7 +7,7 @@ def encode(mess):
     if type(mess) != str:
         raise MyException()
     if not mess:
-        return ''
+        return []
     old = mess[0]
     count = 1
     res = []
@@ -15,22 +15,15 @@ def encode(mess):
         if c == old:
             count += 1
         else:
-            res.append(f'{count}{old}')
+            res.append((count,old))
             count = 1
             old = c
-    res.append(f'{count}{old}')
-    return ''.join(res)
+    res.append((count,old))
+    return res
 
 def decode(mess):
-    res = ''
-    count = 0
-    for c in mess:
-        if c.isdigit():
-            count = count*10 + int(c)
-        else:
-            res += c*count
-            count = 0
-    return res
+    x = [c*i for i,c in mess]
+    return ''.join(x)
 
 if __name__ == '__main__':
     import sys
