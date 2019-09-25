@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+
+    steps:
+      - checkout
+
+      - run:
+          name: Dependencies
+          command: pip install -r requirements.txt
+
+      - run:
+          name: test
+          command: pytest
