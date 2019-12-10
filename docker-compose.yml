@@ -1,0 +1,90 @@
+################################################################################
+# Author: Malthe B. Nielsen
+# Date:   07/12/2019
+# File:   docker-compose.yml
+# subj:   E3SWE
+################################################################################
+
+#Docker compose version. If not specified version 1 will be choosen
+version: '3'
+
+#Specifies all container services
+Service:
+
+#Nginx container, webserver frontend
+#  - Connect at port 80
+  nginx:
+    #Image chooses whats being run in the service, this one is nginx
+    #If only nginx is defined the latest image will be installed
+    #different version can be found here: https://hub.docker.com/_/nginx
+    image: nginx
+    #Ports defines what external port can communicate with the internal port
+    #in the container. In this case it's external 8080 to container 80.
+    #To connect to the container locally use following IP: 127.0.0.1:8080
+    ports:
+      - "8080:80"
+    #defines a volume for this container. In this case the nginx will look
+    #for a config file in the mentioned path.
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    #Networks defines what network a service is a part of. If network is not
+    #defined, then it will default to the standart network.
+    #In this case it's part of the frontend network which is defined in the
+    #bottom. This service will then only be able to communicate with
+    #services in the network frontend.
+    networks:
+      - frontend
+    #Depends_on defines what other services, this service depends ons.
+    #In this case nginx services will not start before the flask service.
+    #If non is defined, the service will start as soon as possible.
+    depends_on:
+      - flask
+
+#Flask container, middleware for controlling
+#  -  Connect to Nginx & Postgres
+  flask:
+    #Build does the same thing as images, but is used if a costume program
+    #is used instead. In this case it's the python application flask.
+    #Build looks at the defined path ./flask after a dockerfile to launch.
+    build: ./flask
+    volumes:
+      - ./flask/:/opt/services/flaskapp/src
+
+    #The flask service will communicate with services in both frontend and
+    #backend networks.
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - db
+
+#Postgres container, database backend
+#  -   Volume mapping to backup on host pc
+  db:
+    #Image chooses whats being run in the service, this one is postgres
+    #If only postgres is defined the latest image will be installed
+    #different version can be found here: https://hub.docker.com/_/postgres/
+    image: postgres
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+#Defines shared Network volumes
+networks:
+  #Creates a network with name backend
+  backend:
+    #Driver defines networks properties
+    #Brigde definition creates a private network between all services
+    #With this network setting
+    driver: bridge
+  #Creates a network with name Frontend
+  frontend:
+    # Creates a driver with bridge settings.
+    driver: bridge
+
+#defines local data volumes
+volumes:
+  #Creates a local data volume called dbdata on the host machine.
+  #dbdata will save it's data in the standard folder /var/lib
+  dbdata:
