@@ -9,12 +9,12 @@
 version: '3'
 
 #Specifies all container services
-Service:
+services:
 
 #Nginx container, webserver frontend
 #  - Connect at port 80
   nginx:
-    #Image chooses whats being run in the service, this one is nginx
+    #Image chooses whats being run in the service, this oane is nginx
     #If only nginx is defined the latest image will be installed
     #different version can be found here: https://hub.docker.com/_/nginx
     image: nginx
