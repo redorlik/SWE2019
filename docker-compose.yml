@@ -49,7 +49,6 @@ services:
     build: ./flask
     volumes:
       - ./flask/:/opt/services/flaskapp/src
-
     #The flask service will communicate with services in both frontend and
     #backend networks.
     networks:
@@ -66,7 +65,7 @@ services:
     #different version can be found here: https://hub.docker.com/_/postgres/
     image: postgres
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - /home/${USER}/Documents/dbdata:/var/lib/postgresql/data
     networks:
       - backend
 
