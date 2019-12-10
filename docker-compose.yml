@@ -81,9 +81,3 @@ networks:
   frontend:
     # Creates a driver with bridge settings.
     driver: bridge
-
-#defines local data volumes
-volumes:
-  #Creates a local data volume called dbdata on the host machine.
-  #dbdata will save it's data in the standard folder /var/lib
-  dbdata:
