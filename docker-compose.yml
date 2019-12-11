@@ -1,0 +1,48 @@
+#Docker compose version. If not specified version 1 will be choosen
+version: '3.7'
+
+#Specifies all container services
+services:
+
+#Postgres container, database backend
+#  -   Volume mapping to backup on host pc
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - "/home/${USER}/Documents/dbdata:/var/lib/postgresql/data"
+    networks:
+      - db_nw
+      
+#Flask container, middleware for controlling
+#  -  Connect to Nginx & Postgres
+  flask:
+    build: ./flask
+    volumes:
+      - ./flask/:/opt/services/flaskapp/src
+    networks:
+      - db_nw
+      - web_nw
+    depends_on:
+      - db
+      
+#Nginx container, webserver frontend
+#  - Connect at port 80
+  nginx:
+    image: nginx:latest 
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - web_nw
+    depends_on: 
+      - flask
+      
+#Defines shared Network volumes
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
