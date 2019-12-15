@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+
+  db:
+    image: postgres:latest
+    restart: always
+    networks:
+      - db_net
+    volumes:
+      - data-volume:/var/lib/postgresql/data/
+
+  flask:
+    build: .
+    volumes:
+      - .:/opt/services/flaskapp/src
+    networks:
+      - db_net
+      - app_net
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:latest
+    networks:
+      - app_net
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - flask
+
+networks:
+  db_net:
+    driver: bridge
+  app_net:
+    driver: bridge
+
+volumes:
+  data-volume:
+    external: true
